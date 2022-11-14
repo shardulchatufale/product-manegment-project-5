@@ -1,6 +1,6 @@
 const userModel=require("../model/userModel")
 const bcrypt=require("bcrypt");
-const { model } = require("mongoose");
+const { model, default: mongoose } = require("mongoose");
 const { json } = require("body-parser");
 const jwt=require("jsonwebtoken")
 
@@ -85,9 +85,9 @@ console.log("........32")
 
 //jeson .parse nahi kiya
 // adress ko destructure nahi kya 
-// if(!data.fname ) nahi kiya
-//if(!Fulladdress.shipping ) nahi kiya lekin is valid lagay
-//encrpted password ko data mai send kiya
+
+
+
 //...........................................................................................................
 const logIn=async function(req,res){
     try{
@@ -117,5 +117,45 @@ const logIn=async function(req,res){
     }    
 
 }
+//............................................................................................................................
 
-module.exports={createUser,logIn}
+const getUser=async function(req,res){
+    const userId=req.params.userId
+        try{
+            console.log("............");
+            console.log(userId)
+    //  if(!userId){return res.status(400).send({status:false,message:"provide userid "})}
+    // if(!mongoose.Types.ObjectId(userId)){return res.status(400).send({status:false,message:"provide userid in proper format"})}
+             console.log("..............129");
+    let findUser=await userModel.find(userId)
+    console.log("............131");
+    if(!findUser){return res.status(400).send({status:false,message:"user is not found"})}
+
+    if(!(userId!=req.deccodeToken.userId)){return res.status(403).send({status:false,message:"unthorise"})}
+
+    res.status(201).send("status:true,findUser")
+         } catch(err){
+            console.log(err.message)
+            res.status(500).send({status:false,message:"server err"})
+         }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports={createUser,logIn,getUser}
+
+//git add git commit git push
