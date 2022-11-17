@@ -122,23 +122,78 @@ const logIn=async function(req,res){
 const getUser=async function(req,res){
     const userId=req.params.userId
         try{
-            console.log("............");
-            console.log(userId)
-    //  if(!userId){return res.status(400).send({status:false,message:"provide userid "})}
-    // if(!mongoose.Types.ObjectId(userId)){return res.status(400).send({status:false,message:"provide userid in proper format"})}
-             console.log("..............129");
-    let findUser=await userModel.find(userId)
-    console.log("............131");
-    if(!findUser){return res.status(400).send({status:false,message:"user is not found"})}
-
-    if(!(userId!=req.deccodeToken.userId)){return res.status(403).send({status:false,message:"unthorise"})}
-
-    res.status(201).send("status:true,findUser")
+            
+console.log(userId)
+     if(!userId){return res.status(400).send({status:false,message:"provide userid "})}
+     if(!mongoose.Types.ObjectId(userId)){return res.status(400).send({status:false,message:"provide userid in proper format"})}
+console.log("..............129");
+     let findUser=await userModel.findById(userId)
+console.log("............131",findUser);
+     if(!findUser){return res.status(400).send({status:false,message:"user is not found"})}
+console.log("...........133");
+     if((userId!=req.decodedToken.userId)){return res.status(403).send({status:false,message:"unthorise"})}
+console.log("...135");
+           res.status(201).send({status:true,findUser})
          } catch(err){
             console.log(err.message)
             res.status(500).send({status:false,message:"server err"})
          }
 }
+//............................................................................
+const updateUser=async function(req,res){
+    const userId=req.params.userId
+     let data=req.body
+
+     console.log(".....147",data)
+     if(!Object.keys(data).length<0){return res.status(400).send({status:false,message:"data is empty"})}
+ 
+     
+    let findUser=await userModel.findOne({_id:userId})
+
+     if(data.fname){
+       if(!nameRegex.test(data.fname)){return res.status(400).send({status:false,message:"provide correct formate of f name"})}
+       if(!isValid(data.fname)){return res.status(400).send({status:false,message:"fname is not valid"})}
+
+                         findUser.fname=data.fname}
+
+     if(data.lname){
+        if(!nameRegex.test(data.lname)){return res.status(400).send({status:false,message:"provide correct formate of l name"})}
+        if(!isValid(data.lname)){return res.status(400).send({status:false,message:"lname is not valid"})}
+
+                          findUser.lname=data.lname}
+      
+     
+     if(data.email){
+        if(!emailRegex.test(data.email)){return res.status(400).send({status:false,message:"provide correct formate of l name"})}
+        let uniqueEmail=await userModel.findOne({email:data.email})
+        if(uniqueEmail){return res.status(400).send({status:false,message:"mail is alredy available"})}
+        
+                           findUser.email=data.email} 
+                     
+     if(data.phone){
+        if(!phoneRejex.test(data.phone)){return res.status(400).send({status:false,message:"please provide proper phone number"})}
+        let uniquePhone=await userModel.findOne({phone:data.phone})
+        if(uniquePhone){return res.status(400).send({status:false,message:"phone is alredy available"})}  
+                           
+                           findUser.phone=data.phone} 
+      
+     if((data.password)){
+        if(!passwordRejex.test(data.password)){return res.status(400).send({status:false,message:"provide prper password"})}
+        let newPassword=await userModel.hash(data.password,10)
+
+                         findUser.password=newPassword}
+
+     
+
+
+    if((userId!=req.decodedToken.userId)){return res.status(403).send({status:false,message:"unthorise"})}
+    // if(userId!=req.decodedToken.userId){return res.status(400).send({status:false,message:"unatorised"})}
+
+   let updatedUser= await userModel.findByIdAndUpdate({_id:userId},findUser,{new:true})
+   res.send(updatedUser)
+
+}
+//........................................................................................
 
 
 
@@ -156,6 +211,6 @@ const getUser=async function(req,res){
 
 
 
-module.exports={createUser,logIn,getUser}
+module.exports={createUser,logIn,getUser,updateUser}
 
 //git add git commit git push

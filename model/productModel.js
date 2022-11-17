@@ -1,20 +1,21 @@
 const mongoose=require("mongoose")
 
 const productSchama=new mongoose.Schema({
-    title:{
-        required:true,type:String, unique:true},
+        title:{required:true,type:String, unique:true},
 
         description:{type:String, required:true},
+
+        price: { type: Number, required: true },
 
         currencyId:{require:true, type:String, enum:["INR"]},
 
         currencyFormat:{type:String,require:true,enum:["₹"]},
 
-        isFreeShipping:{type:Boolean, default:false},
+        isFreeShipping:{type:Boolean, default:false,enum:["true","false"]},
 
         style:{type:String},
 
-        availableSizes:{type:[String], enum:["S", "XS","M","X", "L","XXL", "XL"]},
+        availableSizes:{type:[String]},
 
         installments:{type:Number},
 
@@ -22,9 +23,7 @@ const productSchama=new mongoose.Schema({
 
         isDeleted:{ type:Boolean, default:false},
 
-        createdAt:{timestamp:true},
-
-        updatedAt:{timestamp:true}
+      
 
 
 },{timestamp:true})
